@@ -48,7 +48,7 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Made by [gintaiyo](https://github.com/gintaiyo) or gin_taiyo for discord
+
 ---
 
-Made with ❤ by [gintaiyo](https://github.com/gintaiyo)
+Made by [gintaiyo](https://github.com/gintaiyo) or gin_taiyo for discord
