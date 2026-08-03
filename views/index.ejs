@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tubify - Music Player</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+  <div class="app-container">
+    <sidebar>
+      <div class="brand">
+        <i class="fa-brands fa-youtube"></i> Tubify
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item active" id="navHome" onclick="loadMainView()"><i class="fa-solid fa-house"></i> Home</li>
+        <li class="nav-item" id="navLiked" onclick="loadLikedSongs()"><i class="fa-solid fa-heart"></i> Liked Songs</li>
+      </ul>
+
+      <div class="playlist-section">
+        <div class="playlist-header">
+          <span>YOUR PLAYLISTS</span>
+          <button class="btn-create-pl" onclick="openPlaylistModal()" title="Create Playlist"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <ul class="playlist-list" id="playlistList"></ul>
+      </div>
+    </sidebar>
+
+    <main id="mainContent">
+    
+    </main>
+
+    <div class="right-panel">
+      <div class="tab-header">
+        <span class="tab-btn active"><i class="fa-solid fa-list-ul"></i> Up Next Queue</span>
+        <button class="btn-clear-queue" onclick="clearQueue()">Clear</button>
+      </div>
+
+      <div id="queueContent">
+        <div id="queueList" style="color: var(--text-muted); font-size: 13px;">Queue is empty</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYLIST MODAL -->
+  <div class="modal-overlay" id="plModal">
+    <div class="modal-card">
+      <div class="modal-title">Create Playlist</div>
+      <input type="text" id="plInput" class="modal-input" placeholder="Playlist name..." />
+      <div class="modal-btns">
+        <button class="btn-modal-cancel" onclick="closePlaylistModal()">Cancel</button>
+        <button class="btn-modal-confirm" onclick="confirmCreatePlaylist()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYER BAR -->
+  <div class="player-bar">
+    <div class="now-playing">
+      <img id="currentCover" src="https://picsum.photos/100" alt="Cover" />
+      <div>
+        <div class="track-title" id="currentTitle">Not Playing</div>
+        <div class="track-artist" id="currentArtist">Select a song</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="control-btns">
+        <button class="btn-icon" id="shuffleBtn" onclick="toggleShuffle()"><i class="fa-solid fa-shuffle"></i></button>
+        <button class="btn-icon" onclick="playPrevTrack()"><i class="fa-solid fa-backward-step"></i></button>
+        <button class="btn-play" id="playBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
+        <button class="btn-icon" onclick="playNextTrack()"><i class="fa-solid fa-forward-step"></i></button>
+        <button class="btn-icon" id="loopBtn" onclick="toggleLoop()"><i class="fa-solid fa-repeat"></i></button>
+      </div>
+      <div class="progress-container">
+        <span class="time-lbl" id="currTime">0:00</span>
+        <div class="progress-bar" id="progressBar" onclick="seekTrack(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="time-lbl" id="totalTime">0:00</span>
+      </div>
+    </div>
+
+    <div class="volume-container">
+      <button class="btn-icon" id="muteBtn" onclick="toggleMute()"><i class="fa-solid fa-volume-high"></i></button>
+      <input type="range" class="vol-slider" min="0" max="100" value="70" oninput="setVolume(this.value)" />
+    </div>
+  </div>
+
+  <div id="yt-hidden-player" style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; bottom: 0; left: 0;"></div>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/js/script.js"></script>
+</body>
+</html>
