@@ -52,3 +52,4 @@ Contributions are welcome! Please follow these steps:
 ---
 
 Made by [gintaiyo](https://github.com/gintaiyo) or gin_taiyo for discord
+For any queries dm me on discord `gin_taiyo`
