@@ -1,4 +1,4 @@
-let player;
+let player = null;
 let isReady = false;
 let currentSearchResults = [];
 let upNextQueue = [];
@@ -10,7 +10,9 @@ let savedVolume = localStorage.getItem('tubify_volume') || 70;
 let isMuted = false;
 let isShuffle = false;
 let isLoop = false;
+let smartMixEnabled = true;
 
+// 🚀 Curated Home Categories
 const homeCategories = [
   {
     title: "Trending Today 🚀",
@@ -18,55 +20,98 @@ const homeCategories = [
       { id: "34Na4j8AVgA", title: "Starboy", artist: "The Weeknd ft. Daft Punk", cover: "https://i.ytimg.com/vi/34Na4j8AVgA/mqdefault.jpg" },
       { id: "4NRXx6U8ABQ", title: "Blinding Lights", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg" },
       { id: "JGwWNGJdvx8", title: "Shape of You", artist: "Ed Sheeran", cover: "https://i.ytimg.com/vi/JGwWNGJdvx8/mqdefault.jpg" },
-      { id: "TUVcZfQe-Kw", title: "Levitating", artist: "Dua Lipa", cover: "https://i.ytimg.com/vi/TUVcZfQe-Kw/mqdefault.jpg" },
-      { id: "hT_nvWreIhg", title: "Counting Stars", artist: "OneRepublic", cover: "https://i.ytimg.com/vi/hT_nvWreIhg/mqdefault.jpg" },
-      { id: "09R8_2nJtjg", title: "Sugar", artist: "Maroon 5", cover: "https://i.ytimg.com/vi/09R8_2nJtjg/mqdefault.jpg" }
+      { id: "TUVcZfQe-Kw", title: "Levitating", artist: "Dua Lipa", cover: "https://i.ytimg.com/vi/TUVcZfQe-Kw/mqdefault.jpg" }
     ]
   },
   {
-    title: "Lo-Fi & Chill Vibes ☕",
+    title: "Lo-Fi & Chill ☕",
     tracks: [
       { id: "jfKfPfyJRdk", title: "Lofi Hip Hop Radio - Beats to Relax/Study to", artist: "Lofi Girl", cover: "https://i.ytimg.com/vi/jfKfPfyJRdk/mqdefault.jpg" },
       { id: "5qap5aO4i9A", title: "Lofi Beats for Night Time", artist: "ChilledCow", cover: "https://i.ytimg.com/vi/5qap5aO4i9A/mqdefault.jpg" },
       { id: "DWcJFNfaw9c", title: "Coffee Shop Beats", artist: "ChillHop Music", cover: "https://i.ytimg.com/vi/DWcJFNfaw9c/mqdefault.jpg" },
       { id: "TURbeWK2wwg", title: "Midnight Lo-Fi Chill", artist: "Aesthetic Sounds", cover: "https://i.ytimg.com/vi/TURbeWK2wwg/mqdefault.jpg" }
     ]
+  }
+];
+
+// 🎧 Curated Home Playlists
+const featuredPlaylists = [
+  {
+    name: "XO Essentials",
+    description: "Top hits from Abel Tesfaye (The Weeknd)",
+    icon: "fa-solid fa-crown",
+    tracks: [
+      { id: "34Na4j8AVgA", title: "Starboy", artist: "The Weeknd ft. Daft Punk", cover: "https://i.ytimg.com/vi/34Na4j8AVgA/mqdefault.jpg" },
+      { id: "4NRXx6U8ABQ", title: "Blinding Lights", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg" },
+      { id: "xxM3O_L_jI4", title: "Save Your Tears", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/xxM3O_L_jI4/mqdefault.jpg" },
+      { id: "yzTuBuRdAyA", title: "The Hills", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/yzTuBuRdAyA/mqdefault.jpg" },
+      { id: "KEI4qS4P0S0", title: "Can't Feel My Face", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/KEI4qS4P0S0/mqdefault.jpg" },
+      { id: "waU75jdUnYw", title: "Earned It", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/waU75jdUnYw/mqdefault.jpg" },
+      { id: "1DpH-icPpl0", title: "Call Out My Name", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/1DpH-icPpl0/mqdefault.jpg" },
+      { id: "M4ZoCHID9GI", title: "Heartless", artist: "The Weeknd", cover: "https://i.ytimg.com/vi/M4ZoCHID9GI/mqdefault.jpg" }
+    ]
   },
   {
-    title: "Global Hits & Pop Masters 🌟",
+    name: "808s & Heartbeats",
+    description: "Major Hip-Hop Anthems",
+    icon: "fa-solid fa-compact-disc",
+    tracks: [
+      { id: "uxpDa-c-4Mc", title: "Sicko Mode", artist: "Travis Scott", cover: "https://i.ytimg.com/vi/uxpDa-c-4Mc/mqdefault.jpg" },
+      { id: "0yp58EIn6yA", title: "God's Plan", artist: "Drake", cover: "https://i.ytimg.com/vi/0yp58EIn6yA/mqdefault.jpg" },
+      { id: "tvTRZJ-4EyI", title: "HUMBLE.", artist: "Kendrick Lamar", cover: "https://i.ytimg.com/vi/tvTRZJ-4EyI/mqdefault.jpg" }
+    ]
+  },
+  {
+    name: "Deep Pulse & Echoes",
+    description: "Atmospheric Deep House & Progressive Electronic",
+    icon: "fa-solid fa-bolt",
+    tracks: [
+      { id: "L_LUpnjgPso", title: "Losing It", artist: "FISHER", cover: "https://i.ytimg.com/vi/L_LUpnjgPso/mqdefault.jpg" }
+    ]
+  },
+  {
+    name: "Pop Royalty",
+    description: "Global Chart Toppers & Mainstream Pop",
+    icon: "fa-solid fa-star",
     tracks: [
       { id: "eVli-tstM5E", title: "Espresso", artist: "Sabrina Carpenter", cover: "https://i.ytimg.com/vi/eVli-tstM5E/mqdefault.jpg" },
-      { id: "YykjpeuMNEk", title: "Hymn for the Weekend", artist: "Coldplay", cover: "https://i.ytimg.com/vi/YykjpeuMNEk/mqdefault.jpg" },
-      { id: "kJQP7kiw5Fk", title: "Despacito", artist: "Luis Fonsi ft. Daddy Yankee", cover: "https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg" },
-      { id: "fJ9rUzIMcZQ", title: "Bohemian Rhapsody", artist: "Queen", cover: "https://i.ytimg.com/vi/fJ9rUzIMcZQ/mqdefault.jpg" },
-      { id: "E07s5ZYyg4M", title: "Watermelon Sugar", artist: "Harry Styles", cover: "https://i.ytimg.com/vi/E07s5ZYyg4M/mqdefault.jpg" }
+      { id: "TUVcZfQe-Kw", title: "Levitating", artist: "Dua Lipa", cover: "https://i.ytimg.com/vi/TUVcZfQe-Kw/mqdefault.jpg" }
     ]
   }
 ];
 
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('yt-hidden-player', {
-    height: '1',
-    width: '1',
-    playerVars: {
-      'autoplay': 1,
-      'controls': 0,
-      'disablekb': 1,
-      'enablejsapi': 1,
-      'origin': window.location.origin
-    },
-    events: {
-      'onReady': () => { 
-        isReady = true; 
-        setVolume(savedVolume);
+function initPlayer() {
+  if (player) return;
+  
+  if (window.YT && window.YT.Player) {
+    player = new YT.Player('yt-hidden-player', {
+      height: '1',
+      width: '1',
+      playerVars: {
+        'autoplay': 1,
+        'controls': 0,
+        'disablekb': 1,
+        'enablejsapi': 1,
+        'origin': window.location.origin
       },
-      'onStateChange': onPlayerStateChange
-    }
-  });
+      events: {
+        'onReady': () => { 
+          isReady = true; 
+          setVolume(savedVolume);
+        },
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  }
+}
+
+function onYouTubeIframeAPIReady() {
+  initPlayer();
 }
 
 const playBtn = document.getElementById("playBtn");
 
+// 🔍 Search Handler
 async function handleSearch() {
   const searchInput = document.getElementById("searchInput");
   if (!searchInput) return;
@@ -132,6 +177,27 @@ function filterTracksLive() {
   renderTracks(filtered);
 }
 
+// 🟢 Updates Active Highlight & Wave Animation across all grids
+function updateActiveCardHighlight() {
+  document.querySelectorAll('.track-card').forEach(card => {
+    const trackId = card.getAttribute('data-track-id');
+    const titleEl = card.querySelector('.track-title');
+
+    if (currentTrack && trackId === currentTrack.id) {
+      card.classList.add('playing');
+      if (titleEl && !titleEl.querySelector('.wave-icon')) {
+        titleEl.insertAdjacentHTML('afterbegin', `<i class="fa-solid fa-lines-leaning wave-icon" style="color: var(--tubify-green); margin-right: 6px;"></i>`);
+      }
+    } else {
+      card.classList.remove('playing');
+      if (titleEl) {
+        const icon = titleEl.querySelector('.wave-icon');
+        if (icon) icon.remove();
+      }
+    }
+  });
+}
+
 function renderTracks(tracks, targetGridId = "trackGrid") {
   const container = document.getElementById(targetGridId);
   if (!container) return;
@@ -140,7 +206,11 @@ function renderTracks(tracks, targetGridId = "trackGrid") {
   tracks.forEach((track) => {
     const card = document.createElement("div");
     card.className = "track-card";
+    card.setAttribute('data-track-id', track.id);
     const isLiked = likedSongs.some(s => s.id === track.id);
+    const isPlaying = currentTrack && currentTrack.id === track.id;
+
+    if (isPlaying) card.classList.add('playing');
 
     card.onclick = function(e) {
       if (e.target.closest('.card-actions')) return;
@@ -167,13 +237,41 @@ function renderTracks(tracks, targetGridId = "trackGrid") {
 
       <div class="card-img-wrapper">
         <img src="${track.cover}" class="track-img" onerror="this.onerror=null; this.src='https://picsum.photos/300/300?blur=2';" />
-        <div class="play-btn-float"><i class="fa-solid fa-play"></i></div>
+        <div class="play-btn-float"><i class="fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}"></i></div>
       </div>
-      <div class="track-title">${track.title}</div>
+      <div class="track-title">${isPlaying ? '<i class="fa-solid fa-lines-leaning wave-icon" style="color: var(--tubify-green); margin-right: 6px;"></i>' : ''}${track.title}</div>
       <div class="track-artist">${track.artist}</div>
     `;
     container.appendChild(card);
   });
+}
+
+function renderFeaturedPlaylists() {
+  const wrapper = document.getElementById("featuredPlaylistsGrid");
+  if (!wrapper) return;
+  wrapper.innerHTML = "";
+
+  featuredPlaylists.forEach((pl) => {
+    const card = document.createElement("div");
+    card.className = "track-card playlist-card";
+    card.onclick = () => loadFeaturedPlaylist(pl.name);
+
+    card.innerHTML = `
+      <div class="card-img-wrapper playlist-img-bg">
+        <i class="${pl.icon}"></i>
+        <div class="play-btn-float"><i class="fa-solid fa-play"></i></div>
+      </div>
+      <div class="track-title">${pl.name}</div>
+      <div class="track-artist">${pl.description}</div>
+    `;
+    wrapper.appendChild(card);
+  });
+}
+
+function loadFeaturedPlaylist(plName) {
+  const pl = featuredPlaylists.find(p => p.name === plName);
+  if (!pl) return;
+  renderBannerView(pl.name, "Featured Playlist", pl.icon, pl.tracks, "radial-gradient(circle at top left, #1a090c 0%, #0d1410 40%)");
 }
 
 function toggleDropdown(e, trackId) {
@@ -190,6 +288,7 @@ document.addEventListener('click', () => {
 function getAllFeaturedTracks() {
   let all = [];
   homeCategories.forEach(cat => { all = all.concat(cat.tracks); });
+  featuredPlaylists.forEach(pl => { all = all.concat(pl.tracks); });
   return all;
 }
 
@@ -246,23 +345,53 @@ function playQueueIndex(idx) {
   playSong(track);
 }
 
-async function generateRelatedQueue(artist, title) {
-  try {
-    const query = `${artist} songs mix`;
-    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-    const tracks = await res.json();
-    
-    const filtered = tracks.filter(t => t.id !== currentTrack.id);
-    upNextQueue = upNextQueue.concat(filtered);
-    renderQueue();
-  } catch (e) {
-    console.log("Could not auto-generate queue:", e);
-  }
+// 🎨 Dynamic Adaptive Ambient Background
+function updateAmbientGlow(coverUrl) {
+  const main = document.getElementById("mainContent");
+  if (!main || !coverUrl) return;
+
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = coverUrl;
+
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = 50;
+    canvas.height = 50;
+    ctx.drawImage(img, 0, 0, 50, 50);
+
+    const data = ctx.getImageData(10, 10, 30, 30).data;
+    let r = 0, g = 0, b = 0;
+
+    for (let i = 0; i < data.length; i += 16) {
+      r += data[i];
+      g += data[i + 1];
+      b += data[i + 2];
+    }
+
+    const count = data.length / 16;
+    r = Math.floor((r / count) * 0.4);
+    g = Math.floor((g / count) * 0.4);
+    b = Math.floor((b / count) * 0.4);
+
+    main.style.transition = "background 0.8s ease-in-out";
+    main.style.background = `radial-gradient(circle at top left, rgb(${r + 30}, ${g + 10}, ${b + 20}) 0%, #0d1410 50%)`;
+  };
 }
 
+// 🎵 Track Playback Engine
 function playSong(track) {
-  if (!player || !isReady) return;
+  if (!track) return;
+
+  if (!player || !isReady) {
+    initPlayer();
+    setTimeout(() => playSong(track), 400);
+    return;
+  }
+
   currentTrack = track;
+  updateActiveCardHighlight();
 
   const titleEl = document.getElementById("currentTitle");
   const artistEl = document.getElementById("currentArtist");
@@ -271,6 +400,8 @@ function playSong(track) {
   if (titleEl) titleEl.innerText = track.title.slice(0, 30);
   if (artistEl) artistEl.innerText = track.artist;
   if (coverEl) coverEl.src = track.cover;
+
+  updateAmbientGlow(track.cover);
 
   const fill = document.getElementById("progressFill");
   const curr = document.getElementById("currTime");
@@ -290,15 +421,41 @@ function playSong(track) {
   }
 
   if (playBtn) playBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+}
 
-  if (upNextQueue.length === 0) {
-    generateRelatedQueue(track.artist, track.title);
+function playPlaylistFromStart() {
+  if (currentSearchResults && currentSearchResults.length > 0) {
+    const firstSong = currentSearchResults[0];
+    upNextQueue = [...currentSearchResults.slice(1)];
+    renderQueue();
+    playSong(firstSong);
+  }
+}
+
+// 🔀 Smart Mix Auto-Play
+async function triggerSmartMix() {
+  if (!currentTrack || !smartMixEnabled) return;
+  try {
+    const q = `${currentTrack.artist} similar music`;
+    const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+    const tracks = await res.json();
+    const filtered = tracks.filter(t => t.id !== currentTrack.id).slice(0, 5);
+
+    if (filtered.length > 0) {
+      upNextQueue = filtered;
+      renderQueue();
+      playNextTrack();
+    }
+  } catch (err) {
+    console.log("Smart Mix auto-play fetch failed:", err);
   }
 }
 
 function playNextTrack() {
   if (upNextQueue.length > 0) {
     playQueueIndex(0);
+  } else if (smartMixEnabled) {
+    triggerSmartMix();
   } else if (currentSearchResults.length > 0) {
     const nextIdx = isShuffle ? Math.floor(Math.random() * currentSearchResults.length) : 0;
     playSong(currentSearchResults[nextIdx]);
@@ -457,7 +614,7 @@ function renderBannerView(title, tag, iconClass, tracks, bgGradient) {
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
   main.style.background = bgGradient;
-  currentSearchResults = tracks;
+  currentSearchResults = tracks || [];
 
   main.innerHTML = `
     <div class="search-bar-container">
@@ -474,8 +631,8 @@ function renderBannerView(title, tag, iconClass, tracks, bgGradient) {
         <span class="banner-tag">${tag}</span>
         <h1 class="banner-title">${title}</h1>
         <div class="banner-meta">
-          <span><b>${tracks.length}</b> songs</span>
-          ${tracks.length > 0 ? `<button class="btn-play-hero" onclick="playSong(currentSearchResults[0])"><i class="fa-solid fa-play"></i></button>` : ''}
+          <span><b>${currentSearchResults.length}</b> songs</span>
+          ${currentSearchResults.length > 0 ? `<button class="btn-play-hero" onclick="playPlaylistFromStart()"><i class="fa-solid fa-play"></i></button>` : ''}
         </div>
       </div>
     </div>
@@ -483,7 +640,7 @@ function renderBannerView(title, tag, iconClass, tracks, bgGradient) {
     <div class="track-grid" id="trackGrid"></div>
   `;
 
-  renderTracks(tracks);
+  renderTracks(currentSearchResults);
   bindSearchKey();
 }
 
@@ -516,10 +673,18 @@ function loadMainView() {
       </div>
       <button class="btn-search" onclick="handleSearch()">Search</button>
     </div>
+    
+    <div style="margin-bottom:36px;">
+      <h2 class="section-title">Featured Playlists 📀</h2>
+      <div class="track-grid" id="featuredPlaylistsGrid"></div>
+    </div>
+
     <div id="homeCategoriesWrapper"></div>
   `;
 
   main.innerHTML = html;
+
+  renderFeaturedPlaylists();
 
   const wrapper = document.getElementById("homeCategoriesWrapper");
   homeCategories.forEach((cat, idx) => {
@@ -531,8 +696,8 @@ function loadMainView() {
     `;
     wrapper.appendChild(section);
     
-    const shuffledTracks = [...cat.tracks].sort(() => 0.5 - Math.random());
-    renderTracks(shuffledTracks, `catGrid-${idx}`);
+    const limitedTracks = cat.tracks.slice(0, 4);
+    renderTracks(limitedTracks, `catGrid-${idx}`);
   });
 
   bindSearchKey();
@@ -574,8 +739,42 @@ function seekTrack(e) {
   }
 }
 
+// ⌨️ Expanded Keyboard Shortcuts Handler
 document.addEventListener("keydown", (e) => {
-  if (e.target.tagName === 'INPUT') return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  if (e.code === "Space") {
+    e.preventDefault();
+    togglePlay();
+  }
+
+  if (e.code === "KeyM") {
+    e.preventDefault();
+    toggleMute();
+  }
+
+  if (e.code === "KeyL") {
+    e.preventDefault();
+    if (currentTrack) {
+      const fakeEvent = { stopPropagation: () => {} };
+      toggleLike(fakeEvent, currentTrack.id);
+    }
+  }
+
+  if (e.code === "ArrowRight") {
+    e.preventDefault();
+    if (player && typeof player.getCurrentTime === 'function') {
+      player.seekTo(player.getCurrentTime() + 5, true);
+    }
+  }
+
+  if (e.code === "ArrowLeft") {
+    e.preventDefault();
+    if (player && typeof player.getCurrentTime === 'function') {
+      player.seekTo(Math.max(0, player.getCurrentTime() - 5), true);
+    }
+  }
+
   if (e.code === "ArrowUp") {
     e.preventDefault();
     const slider = document.querySelector(".vol-slider");
@@ -584,6 +783,7 @@ document.addEventListener("keydown", (e) => {
       setVolume(slider.value);
     }
   }
+
   if (e.code === "ArrowDown") {
     e.preventDefault();
     const slider = document.querySelector(".vol-slider");
@@ -599,4 +799,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (volSlider) volSlider.value = savedVolume;
   renderPlaylists();
   loadMainView();
+  initPlayer();
 });
